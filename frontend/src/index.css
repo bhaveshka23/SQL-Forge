@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --forge-bg: #F5F6F8;
+  --forge-surface: #FFFFFF;
+  --forge-card: #FFFFFF;
+  --forge-card-alt: #EEF0F4;
+  --forge-text: #121417;
+  --forge-muted: #5E636E;
+  --forge-border: #D4D8E0;
+  --forge-accent: #FF6B35;
+  --forge-accent-hover: #E85622;
+  --forge-success: #15803D;
+  --grid-color: rgba(148, 163, 184, 0.28);
+  color-scheme: light;
+}
+
+html.dark {
+  --forge-bg: #101114;
+  --forge-surface: #191B20;
+  --forge-card: #202228;
+  --forge-card-alt: #141519;
+  --forge-text: #F4F1EA;
+  --forge-muted: #92949B;
+  --forge-border: #303238;
+  --forge-accent: #FF6B35;
+  --forge-accent-hover: #FF8354;
+  --forge-success: #52C788;
+  --grid-color: rgba(48, 50, 56, 0.35);
+  color-scheme: dark;
+}
+
+@theme {
+  --color-forge-bg: var(--forge-bg);
+  --color-forge-surface: var(--forge-surface);
+  --color-forge-card: var(--forge-card);
+  --color-forge-card-alt: var(--forge-card-alt);
+  --color-forge-accent: var(--forge-accent);
+  --color-forge-accent-hover: var(--forge-accent-hover);
+  --color-forge-text: var(--forge-text);
+  --color-forge-muted: var(--forge-muted);
+  --color-forge-border: var(--forge-border);
+  --color-forge-success: var(--forge-success);
+
+  --font-heading: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background-color: var(--forge-bg);
+  color: var(--forge-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: var(--forge-bg);
+}
+
+/* Industrial Grid Pattern */
+.industrial-grid {
+  background-image: 
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--forge-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--forge-border);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--forge-accent);
+}
