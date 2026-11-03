@@ -1,9 +1,69 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link , useNavigate } from 'react-router-dom'
+import axios from "axios"
+import { toast } from "react-toastify";
+
+
 
 function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  
+  const navigate = useNavigate();
+
+  const [formData , setFormData] = useState({
+    username :"",
+    password :"",
+  });
+
+  const [loading,setLoading] = useState(false);
+
+  const handleChange = (e) =>{
+    setFormData({
+      ...formData,
+      [e.target.name] : e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) =>{
+    e.preventDefault();
+
+    setLoading(true);
+
+    try{
+      const response = await axios.post (
+        "http://127.0.0.1:8000/api/v1/auth/login/",
+        {
+          username : formData.username,
+          password : formData.password,
+        }
+      );
+
+      localStorage.setItem (
+        "accessToken",
+        response.data.access
+      );
+
+      localStorage.setItem(
+        "refreshToken",
+        response.data.refresh
+      );
+
+      toast.success("Login successful!");
+
+      // Redirect to dashboard
+        navigate("/dashboard");
+    }catch(error){
+
+      const errorMessage = 
+      error.response?.data?.detail ||
+      error.response?.data?.message ||
+      "Invalid email or password";
+
+      toast.error(errorMessage);
+    }finally{
+      setLoading(false);
+    }
+  }
+
 
   return (
     <div className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-16 bg-forge-bg text-forge-text transition-colors duration-200">
@@ -24,16 +84,17 @@ function LoginPage() {
           </p>
         </div>
 
-        <form onSubmit={(e) => e.preventDefault()} className="mt-8 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           <div>
             <label className="block font-['JetBrains_Mono'] text-xs uppercase tracking-wider text-forge-muted">
-              EMAIL ADDRESS
+              USERNAME
             </label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@example.com"
+              type="text"
+              name = "username"
+              value={formData.username}
+              onChange={handleChange}
+              placeholder="Enter your username"
               className="mt-1.5 w-full border border-forge-border bg-forge-card-alt px-3.5 py-2.5 font-['JetBrains_Mono'] text-sm text-forge-text placeholder-forge-muted/40 focus:border-forge-accent focus:outline-none"
             />
           </div>
@@ -49,8 +110,9 @@ function LoginPage() {
             </div>
             <input
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              name = "password"
+              value={formData.password}
+              onChange={handleChange}
               placeholder="••••••••••••"
               className="mt-1.5 w-full border border-forge-border bg-forge-card-alt px-3.5 py-2.5 font-['JetBrains_Mono'] text-sm text-forge-text placeholder-forge-muted/40 focus:border-forge-accent focus:outline-none"
             />
@@ -59,8 +121,9 @@ function LoginPage() {
           <button
             type="submit"
             className="mt-6 w-full border border-forge-accent bg-forge-accent py-3 font-['JetBrains_Mono'] text-xs font-bold uppercase tracking-wider text-[#101114] transition-colors hover:bg-forge-accent-hover"
+            disabled={loading}
           >
-            LOG IN ↗
+            {loading ? "LOGGING IN..." : "LOG IN ↗"}
           </button>
         </form>
 
