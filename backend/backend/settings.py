@@ -115,6 +115,20 @@ DATABASES = {
         'PASSWORD': 'SqlNest@123',
         'HOST': 'localhost',
         'PORT': '3306',
+    },
+
+     # New SQLForge practice database
+    'practice': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'sqlforge_practice',
+        'USER': 'sqlforge_runner',
+        'PASSWORD': 'sql_forge@123',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'connect_timeout': 10,
+        },
     }
 }
 
