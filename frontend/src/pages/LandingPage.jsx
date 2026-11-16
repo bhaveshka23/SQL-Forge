@@ -5,16 +5,16 @@ import { Link } from 'react-router-dom'
 const CHALLENGES = [
   {
     id: '01',
-    category: 'WINDOW FUNCTIONS',
+    category: 'Window Functions',
     title: 'Find Top 3 Highest Earners Per Department',
-    difficulty: 'MEDIUM',
+    difficulty: 'Medium',
     runtimeLimit: '50ms',
     file: 'top_department_salaries.sql',
     dialect: 'PostgreSQL 16',
     description:
-      'Write a query to find the top 3 highest-paid employees in each team. If two employees earn the same salary, give them the same rank.',
+      'Write a query to find the top 3 highest-paid employees in each department. If two employees earn the same salary, assign them the same rank.',
     schema: 'employees (id, name, department, salary, status)',
-    sql: `-- Find top 3 earners in each team, handling ties fairly
+    sql: `-- Find top 3 earners in each department, handling ties
 WITH ranked_salaries AS (
   SELECT
     e.name AS employee_name,
@@ -40,22 +40,21 @@ ORDER BY department ASC, salary_rank ASC;`,
       { col1: 'Devon Miller', col2: 'Security', col3: '$198,000', col4: '2' },
     ],
     columns: ['employee_name', 'department', 'salary', 'salary_rank'],
-    stats: { executionTime: '12ms', costScore: 'Good', memory: '1.8MB' },
+    stats: { executionTime: '12ms', costScore: 'Optimal' },
   },
   {
     id: '02',
-    category: 'RECURSIVE QUERIES',
-    title: 'Show Company Org Chart & Managers',
-    difficulty: 'HARD',
+    category: 'Recursive CTEs',
+    title: 'Company Org Hierarchy & Reporting Chain',
+    difficulty: 'Hard',
     runtimeLimit: '80ms',
     file: 'company_org_hierarchy.sql',
     dialect: 'PostgreSQL 16',
     description:
-      'Build a query that walks down an employee list to show who reports to whom, starting from the VP all the way to junior team members.',
+      'Build a query that traverses an employee organization chart to show who reports to whom, from the VP down to junior developers.',
     schema: 'employees (id, name, manager_id, job_title)',
-    sql: `-- Trace the reporting chain from VP to every employee
+    sql: `-- Trace reporting chain from leadership to every employee
 WITH RECURSIVE org_tree AS (
-  -- Start with the top leader (no manager)
   SELECT 
     id,
     job_title,
@@ -66,7 +65,6 @@ WITH RECURSIVE org_tree AS (
 
   UNION ALL
 
-  -- Connect each employee to their manager
   SELECT 
     child.id,
     child.job_title,
@@ -85,13 +83,13 @@ ORDER BY level ASC, id ASC;`,
       { col1: '412', col2: 'Junior Developer', col3: 'Level 4', col4: 'VP -> Manager -> Senior -> Junior' },
     ],
     columns: ['employee_id', 'job_title', 'level', 'reporting_chain'],
-    stats: { executionTime: '16ms', costScore: 'Optimal', memory: '2.4MB' },
+    stats: { executionTime: '16ms', costScore: 'Optimal' },
   },
   {
     id: '03',
-    category: 'USER ACTIVITY',
-    title: 'Group Website Visits Into Sessions',
-    difficulty: 'HARD',
+    category: 'User Activity',
+    title: 'Group Website Visits Into Inactivity Sessions',
+    difficulty: 'Hard',
     runtimeLimit: '60ms',
     file: 'user_session_split.sql',
     dialect: 'PostgreSQL 16',
@@ -125,7 +123,7 @@ FROM inactivity_check;`,
       { col1: 'user_401', col2: '11:20 AM', col3: 'Session 2', col4: 'Checked Out' },
     ],
     columns: ['user_id', 'event_time', 'session_id', 'activity'],
-    stats: { executionTime: '14ms', costScore: 'Good', memory: '2.1MB' },
+    stats: { executionTime: '14ms', costScore: 'Optimal' },
   },
 ]
 
@@ -152,126 +150,91 @@ function LandingPage() {
 
   return (
     <div className="relative min-h-screen bg-forge-bg text-forge-text transition-colors duration-200">
-      {/* Background Engineering Grid Pattern */}
-      <div className="pointer-events-none absolute inset-0 industrial-grid opacity-30" />
-
       {/* ========================================================================= */}
-      {/* HERO SECTION: Asymmetrical Two-Column Industrial Layout                   */}
+      {/* HERO SECTION                                                              */}
       {/* ========================================================================= */}
       <section className="relative z-10 mx-auto max-w-7xl px-4 pt-12 pb-20 sm:px-6 sm:pt-20 lg:px-8 lg:pb-28">
-        <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-8">
-          {/* Left Column: Industrial Typography & Copy (6 cols) */}
-          <div className="flex flex-col lg:col-span-6 xl:col-span-6">
-            {/* Small Technical Label */}
-            <div className="mb-6 flex flex-wrap items-center gap-3">
-              <span className="inline-flex items-center gap-2 border border-forge-border bg-forge-surface px-3 py-1 font-['JetBrains_Mono'] text-xs font-semibold uppercase tracking-widest text-forge-accent">
-                <span className="h-1.5 w-1.5 bg-forge-accent" />
-                INTERACTIVE SQL PRACTICE // 001
-              </span>
-              <span className="font-['JetBrains_Mono'] text-[11px] text-forge-muted">
-                [RUNS IN YOUR BROWSER]
-              </span>
+        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-8">
+          {/* Left Column */}
+          <div className="flex flex-col lg:col-span-6">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-forge-border bg-forge-surface px-3 py-1 text-xs font-medium text-forge-accent w-fit">
+              <span className="h-2 w-2 rounded-full bg-forge-accent" />
+              <span>Interactive SQL Practice Platform</span>
             </div>
 
-            {/* Headline */}
-            <h1 className="font-['Space_Grotesk'] text-4xl font-extrabold tracking-tight text-forge-text sm:text-6xl xl:text-7xl">
-              DON'T JUST
+            <h1 className="font-['Space_Grotesk'] text-4xl font-extrabold tracking-tight text-forge-text sm:text-6xl">
+              Don't just learn SQL.
               <br />
-              LEARN SQL.
-              <br />
-              <span className="relative inline-block text-forge-accent">
-                FORGE YOUR SKILLS.
-                <span className="absolute -bottom-1 left-0 h-1 w-20 bg-forge-accent" />
-              </span>
+              <span className="text-forge-accent">Master real skills.</span>
             </h1>
 
-            {/* Supporting Text */}
-            <p className="mt-8 max-w-xl font-['Inter'] text-lg font-normal leading-relaxed text-forge-muted">
-              Write queries. Solve real-world challenges. Build the confidence to succeed in
-              technical interviews.
+            <p className="mt-6 max-w-xl text-lg text-forge-muted leading-relaxed">
+              Write queries. Solve real-world challenges. Build the confidence to succeed in technical interviews.
             </p>
 
             {/* CTA Buttons */}
-            <div className="mt-10 flex flex-wrap items-center gap-4">
+            <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
                 to="/signup"
-                className="group relative inline-flex items-center gap-3 border border-forge-accent bg-forge-accent px-7 py-3.5 font-['JetBrains_Mono'] text-sm font-bold uppercase tracking-wider text-[#101114] transition-all hover:bg-forge-accent-hover hover:border-forge-accent-hover"
+                className="inline-flex items-center gap-2 rounded-lg border border-forge-accent bg-forge-accent px-6 py-3 text-sm font-semibold text-[#101114] transition-all hover:bg-forge-accent-hover hover:border-forge-accent-hover shadow-xs"
               >
-                <span>START FORGING</span>
-                <span className="text-base font-bold transition-transform duration-150 group-hover:translate-x-1 group-hover:-translate-y-1">
-                  ↗
-                </span>
-                {/* Industrial Corner Notch */}
-                <span className="absolute -top-1 -left-1 h-2 w-2 bg-forge-bg" />
-                <span className="absolute -bottom-1 -right-1 h-2 w-2 bg-forge-bg" />
+                <span>Start Practicing Free</span>
+                <span aria-hidden="true">→</span>
               </Link>
 
               <a
                 href="#features"
-                className="inline-flex items-center gap-2 border border-forge-border bg-forge-surface px-6 py-3.5 font-['JetBrains_Mono'] text-sm font-semibold uppercase tracking-wider text-forge-text transition-colors hover:border-forge-muted hover:bg-forge-card-alt"
+                className="inline-flex items-center gap-2 rounded-lg border border-forge-border bg-forge-surface px-5 py-3 text-sm font-medium text-forge-text transition-colors hover:bg-forge-card-alt"
               >
-                <span>EXPLORE PLATFORM</span>
+                <span>Explore Features</span>
                 <span className="text-xs text-forge-muted">↓</span>
               </a>
             </div>
 
-            {/* Technical Metadata Footer */}
-            <div className="mt-14 border-t border-forge-border pt-6">
-              <div className="grid grid-cols-2 gap-4 font-['JetBrains_Mono'] text-xs sm:grid-cols-3">
+            {/* Quick Specs */}
+            <div className="mt-12 border-t border-forge-border pt-6">
+              <div className="grid grid-cols-3 gap-4 text-xs">
                 <div>
-                  <div className="text-[10px] uppercase text-forge-muted">DATABASES</div>
-                  <div className="mt-1 font-semibold text-forge-text">POSTGRES & MYSQL</div>
+                  <div className="font-medium text-forge-muted uppercase tracking-wider text-[11px]">Databases</div>
+                  <div className="mt-1 font-semibold text-forge-text">Postgres & MySQL</div>
                 </div>
                 <div>
-                  <div className="text-[10px] uppercase text-forge-muted">INTERVIEW DRILLS</div>
-                  <div className="mt-1 font-semibold text-forge-text">500+ PROBLEMS</div>
+                  <div className="font-medium text-forge-muted uppercase tracking-wider text-[11px]">Challenges</div>
+                  <div className="mt-1 font-semibold text-forge-text">500+ Practice Drills</div>
                 </div>
                 <div>
-                  <div className="text-[10px] uppercase text-forge-muted">SETUP TIME</div>
-                  <div className="mt-1 flex items-center gap-1.5 font-semibold text-forge-success">
-                    <span className="h-1.5 w-1.5 animate-ping rounded-full bg-forge-success" />
-                    ZERO // INSTANT
-                  </div>
+                  <div className="font-medium text-forge-muted uppercase tracking-wider text-[11px]">Setup Time</div>
+                  <div className="mt-1 font-semibold text-forge-success">Instant in Browser</div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Industrial Terminal / Query Editor Preview (6 cols) */}
-          <div className="w-full lg:col-span-6 xl:col-span-6">
-            <div className="relative border border-forge-border bg-forge-surface shadow-2xl">
-              {/* Corner Coordinate Badges */}
-              <div className="absolute -top-2.5 -left-2.5 bg-forge-bg px-1 font-['JetBrains_Mono'] text-[9px] text-forge-muted">
-                + 001.EDITOR
-              </div>
-              <div className="absolute -bottom-2.5 -right-2.5 bg-forge-bg px-1 font-['JetBrains_Mono'] text-[9px] text-forge-muted">
-                LIVE PREVIEW
-              </div>
-
+          {/* Right Column: Code Editor Preview */}
+          <div className="w-full lg:col-span-6">
+            <div className="rounded-2xl border border-forge-border bg-forge-surface shadow-xl overflow-hidden">
               {/* Terminal Title Bar */}
-              <div className="flex flex-wrap items-center justify-between border-b border-forge-border bg-forge-card-alt px-4 py-2.5">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1.5">
-                    <span className="h-2.5 w-2.5 border border-forge-border bg-forge-accent" />
-                    <span className="h-2.5 w-2.5 border border-forge-border bg-forge-border" />
-                    <span className="h-2.5 w-2.5 border border-forge-border bg-forge-border" />
-                  </div>
-                  <span className="font-['JetBrains_Mono'] text-xs font-semibold text-forge-text">
+              <div className="flex flex-wrap items-center justify-between border-b border-forge-border bg-forge-card-alt px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-full bg-red-500/80 inline-block" />
+                  <span className="h-3 w-3 rounded-full bg-yellow-500/80 inline-block" />
+                  <span className="h-3 w-3 rounded-full bg-green-500/80 inline-block" />
+                  <span className="ml-2 font-mono text-xs font-medium text-forge-text">
                     monthly_user_retention.sql
                   </span>
                 </div>
 
                 {/* Dialect Switcher Pills */}
-                <div className="flex items-center gap-1 font-['JetBrains_Mono'] text-[10px]">
+                <div className="flex items-center gap-1 text-xs">
                   {['PostgreSQL 16', 'MySQL 8.4', 'DuckDB'].map((dialect) => (
                     <button
                       key={dialect}
                       type="button"
                       onClick={() => setHeroDialect(dialect)}
-                      className={`px-2 py-0.5 uppercase transition-colors ${
+                      className={`rounded px-2 py-0.5 text-xs transition-colors cursor-pointer ${
                         heroDialect === dialect
-                          ? 'border border-forge-accent bg-forge-accent/15 text-forge-accent'
-                          : 'border border-transparent text-forge-muted hover:text-forge-text'
+                          ? 'bg-forge-accent/15 text-forge-accent font-semibold'
+                          : 'text-forge-muted hover:text-forge-text'
                       }`}
                     >
                       {dialect}
@@ -280,11 +243,10 @@ function LandingPage() {
                 </div>
               </div>
 
-              {/* Editor Workspace & Syntax Highlighting (High-contrast code area) */}
-              <div className="overflow-x-auto bg-[#101114] p-4 font-['JetBrains_Mono'] text-xs leading-6 text-[#F4F1EA]">
+              {/* Editor Workspace & Code */}
+              <div className="overflow-x-auto bg-[#101114] p-4 font-mono text-xs leading-6 text-[#F4F1EA]">
                 <div className="grid grid-cols-[auto_1fr] gap-x-4">
-                  {/* Line Numbers */}
-                  <div className="select-none text-right font-['JetBrains_Mono'] text-[#92949B]/40">
+                  <div className="select-none text-right text-[#92949B]/40">
                     <div>01</div>
                     <div>02</div>
                     <div>03</div>
@@ -293,108 +255,67 @@ function LandingPage() {
                     <div>06</div>
                     <div>07</div>
                     <div>08</div>
-                    <div>09</div>
-                    <div>10</div>
-                    <div>11</div>
-                    <div>12</div>
                   </div>
 
-                  {/* SQL Syntax Code */}
                   <div>
-                    <div className="text-[#92949B]">
-                      <span className="text-[#92949B]">-- Count active users returning each month</span>
-                    </div>
+                    <div className="text-[#92949B]">-- Count active users returning each month</div>
                     <div>
-                      <span className="font-bold text-[#FF6B35]">WITH</span>{' '}
-                      <span className="text-[#F4F1EA]">monthly_activity</span>{' '}
-                      <span className="font-bold text-[#FF6B35]">AS</span> (
+                      <span className="font-bold text-[#FF6B35]">WITH</span> monthly_activity <span className="font-bold text-[#FF6B35]">AS</span> (
                     </div>
                     <div className="pl-4">
                       <span className="font-bold text-[#FF6B35]">SELECT</span> user_id,
                     </div>
                     <div className="pl-6">
-                      <span className="text-[#38BDF8]">DATE_TRUNC</span>
-                      ('month', visit_date) <span className="font-bold text-[#FF6B35]">AS</span> active_month,
+                      <span className="text-[#38BDF8]">DATE_TRUNC</span>('month', visit_date) <span className="font-bold text-[#FF6B35]">AS</span> active_month
                     </div>
-                    <div className="pl-6">
-                      <span className="text-[#38BDF8]">DENSE_RANK</span>() <span className="font-bold text-[#FF6B35]">OVER</span> (
-                    </div>
-                    <div className="pl-8">
-                      <span className="font-bold text-[#FF6B35]">PARTITION BY</span> user_id{' '}
-                      <span className="font-bold text-[#FF6B35]">ORDER BY</span> visit_date
-                    </div>
-                    <div className="pl-6">) <span className="font-bold text-[#FF6B35]">AS</span> visit_count</div>
                     <div className="pl-4">
                       <span className="font-bold text-[#FF6B35]">FROM</span> user_activity
                     </div>
-                    <div className="pl-4">
-                      <span className="font-bold text-[#FF6B35]">WHERE</span> status ={' '}
-                      <span className="text-[#52C788]">'ACTIVE'</span>
-                    </div>
                     <div>)</div>
                     <div>
-                      <span className="font-bold text-[#FF6B35]">SELECT</span> active_month,{' '}
-                      <span className="text-[#38BDF8]">COUNT</span>(<span className="font-bold text-[#FF6B35]">DISTINCT</span> user_id) <span className="font-bold text-[#FF6B35]">AS</span> total_users
+                      <span className="font-bold text-[#FF6B35]">SELECT</span> active_month, <span className="text-[#38BDF8]">COUNT</span>(DISTINCT user_id) <span className="font-bold text-[#FF6B35]">AS</span> users
                     </div>
                     <div>
-                      <span className="font-bold text-[#FF6B35]">FROM</span> monthly_activity{' '}
-                      <span className="font-bold text-[#FF6B35]">GROUP BY</span> active_month;
+                      <span className="font-bold text-[#FF6B35]">FROM</span> monthly_activity <span className="font-bold text-[#FF6B35]">GROUP BY</span> active_month;
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Action Toolbar */}
-              <div className="flex flex-wrap items-center justify-between border-t border-forge-border bg-forge-card-alt px-4 py-2.5">
-                <div className="flex items-center gap-3 font-['JetBrains_Mono'] text-[11px] text-forge-muted">
-                  <span>DIALECT: {heroDialect.toUpperCase()}</span>
-                  <span>|</span>
-                  <span className="hidden sm:inline">READY TO RUN</span>
-                </div>
+              <div className="flex items-center justify-between border-t border-forge-border bg-forge-card-alt px-4 py-2.5 text-xs text-forge-muted">
+                <span>Dialect: {heroDialect}</span>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleRunHeroQuery}
-                    disabled={isRunningHero}
-                    className="inline-flex items-center gap-2 border border-forge-accent bg-forge-accent px-3.5 py-1.5 font-['JetBrains_Mono'] text-xs font-bold uppercase tracking-wider text-[#101114] transition-all hover:bg-forge-accent-hover"
-                  >
-                    {isRunningHero ? (
-                      <>
-                        <span className="h-2 w-2 animate-spin rounded-full border-2 border-[#101114] border-t-transparent" />
-                        <span>RUNNING QUERY...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>▶ RUN QUERY</span>
-                        <span className="hidden text-[10px] text-[#101114]/75 sm:inline">[CLICK TO TEST]</span>
-                      </>
-                    )}
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={handleRunHeroQuery}
+                  disabled={isRunningHero}
+                  className="rounded-lg inline-flex items-center gap-2 border border-forge-accent bg-forge-accent px-3 py-1 text-xs font-semibold text-[#101114] transition-all hover:bg-forge-accent-hover cursor-pointer"
+                >
+                  {isRunningHero ? 'Running Query...' : '▶ Run Query'}
+                </button>
               </div>
 
-              {/* Terminal Execution Result Drawer */}
+              {/* Terminal Execution Result */}
               <div className="border-t border-forge-border bg-forge-surface p-4">
-                <div className="mb-2 flex items-center justify-between font-['JetBrains_Mono'] text-[11px]">
-                  <span className="flex items-center gap-1.5 text-forge-success">
-                    <span className="h-1.5 w-1.5 bg-forge-success" />
+                <div className="mb-2 flex items-center justify-between text-xs">
+                  <span className="text-forge-success font-semibold flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-forge-success" />
                     {heroExecutionState === 'RUNNING'
-                      ? 'EXECUTING QUERY...'
-                      : '✓ SUCCESS: 3 ROWS RETURNED (14MS)'}
+                      ? 'Executing query...'
+                      : '✓ Query successful: 3 rows returned (14ms)'}
                   </span>
-                  <span className="text-forge-muted">STATUS: ALL TESTS PASSED</span>
+                  <span className="text-forge-muted">All tests passed</span>
                 </div>
 
-                {/* Result Table Preview */}
-                <div className="overflow-x-auto border border-forge-border bg-forge-card-alt">
-                  <table className="w-full text-left font-['JetBrains_Mono'] text-xs">
+                <div className="overflow-x-auto rounded-lg border border-forge-border bg-forge-card-alt">
+                  <table className="w-full text-left font-mono text-xs">
                     <thead>
-                      <tr className="border-b border-forge-border bg-forge-surface text-[10px] uppercase tracking-wider text-forge-muted">
+                      <tr className="border-b border-forge-border bg-forge-surface text-[10px] uppercase text-forge-muted">
                         <th className="px-3 py-2">active_month</th>
                         <th className="px-3 py-2">total_users</th>
-                        <th className="px-3 py-2">retention_rate</th>
-                        <th className="px-3 py-2">result</th>
+                        <th className="px-3 py-2">retention</th>
+                        <th className="px-3 py-2">status</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-forge-border text-forge-text">
@@ -402,19 +323,13 @@ function LandingPage() {
                         <td className="px-3 py-1.5 text-forge-accent">August 2026</td>
                         <td className="px-3 py-1.5">14,208</td>
                         <td className="px-3 py-1.5">88.4%</td>
-                        <td className="px-3 py-1.5 text-forge-success">PASSED</td>
+                        <td className="px-3 py-1.5 text-forge-success font-semibold">PASSED</td>
                       </tr>
                       <tr>
                         <td className="px-3 py-1.5 text-forge-accent">September 2026</td>
                         <td className="px-3 py-1.5">18,940</td>
                         <td className="px-3 py-1.5">91.2%</td>
-                        <td className="px-3 py-1.5 text-forge-success">PASSED</td>
-                      </tr>
-                      <tr>
-                        <td className="px-3 py-1.5 text-forge-accent">October 2026</td>
-                        <td className="px-3 py-1.5">24,510</td>
-                        <td className="px-3 py-1.5">94.8%</td>
-                        <td className="px-3 py-1.5 text-forge-success">PASSED</td>
+                        <td className="px-3 py-1.5 text-forge-success font-semibold">PASSED</td>
                       </tr>
                     </tbody>
                   </table>
@@ -426,214 +341,144 @@ function LandingPage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* TELEMETRY METRIC STRIP: Clear, Simple Statistics                          */}
+      {/* STATS COUNTER STRIP                                                       */}
       {/* ========================================================================= */}
-      <section className="relative z-10 border-y border-forge-border bg-forge-surface">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <section className="relative z-10 border-y border-forge-border bg-forge-surface/60 py-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 lg:gap-8">
             <div className="border-l-2 border-forge-accent pl-4">
               <div className="font-['Space_Grotesk'] text-3xl font-bold tracking-tight text-forge-text">
                 {queryExecutionCount.toLocaleString()}+
               </div>
-              <div className="mt-1 font-['JetBrains_Mono'] text-xs uppercase tracking-wider text-forge-muted">
-                QUERIES RUN BY USERS
-              </div>
+              <div className="mt-1 text-xs text-forge-muted">Queries Run by Users</div>
             </div>
 
             <div className="border-l-2 border-forge-border pl-4">
               <div className="font-['Space_Grotesk'] text-3xl font-bold tracking-tight text-forge-text">
                 500+
               </div>
-              <div className="mt-1 font-['JetBrains_Mono'] text-xs uppercase tracking-wider text-forge-muted">
-                PRACTICE QUESTIONS
-              </div>
+              <div className="mt-1 text-xs text-forge-muted">Practice Questions</div>
             </div>
 
             <div className="border-l-2 border-forge-border pl-4">
               <div className="font-['Space_Grotesk'] text-3xl font-bold tracking-tight text-forge-success">
-                &lt; 18MS
+                &lt; 18ms
               </div>
-              <div className="mt-1 font-['JetBrains_Mono'] text-xs uppercase tracking-wider text-forge-muted">
-                AVERAGE RUN SPEED
-              </div>
+              <div className="mt-1 text-xs text-forge-muted">Average Run Speed</div>
             </div>
 
             <div className="border-l-2 border-forge-border pl-4">
               <div className="font-['Space_Grotesk'] text-3xl font-bold tracking-tight text-forge-text">
                 100%
               </div>
-              <div className="mt-1 font-['JetBrains_Mono'] text-xs uppercase tracking-wider text-forge-muted">
-                REAL DATABASE ACCURACY
-              </div>
+              <div className="mt-1 text-xs text-forge-muted">Real Database Output</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* ========================================================================= */}
-      {/* SECTION 01: PLATFORM CORE FEATURES (Simple, Understandable)               */}
+      {/* FEATURES SECTION                                                          */}
       {/* ========================================================================= */}
-      <section id="features" className="relative z-10 mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between">
-          <div>
-            <div className="flex items-center gap-2 font-['JetBrains_Mono'] text-xs font-semibold uppercase tracking-widest text-forge-accent">
-              <span>// 01 FEATURES</span>
-              <span className="text-forge-border">|</span>
-              <span className="text-forge-muted">WHY ENGINEERS USE IT</span>
-            </div>
-            <h2 className="mt-3 font-['Space_Grotesk'] text-3xl font-bold tracking-tight text-forge-text sm:text-5xl">
-              HOW SQLFORGE HELPS YOU LEARN.
-            </h2>
+      <section id="features" className="relative z-10 mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+        <div className="max-w-2xl">
+          <div className="text-xs font-semibold uppercase tracking-wider text-forge-accent">
+            Features
           </div>
-          <p className="mt-4 max-w-md font-['Inter'] text-sm leading-relaxed text-forge-muted md:mt-0">
-            No boring video lectures or fake multiple-choice questions. You learn by writing real
-            queries and seeing instant results.
+          <h2 className="mt-2 font-['Space_Grotesk'] text-3xl font-bold tracking-tight text-forge-text sm:text-4xl">
+            Everything you need to master SQL.
+          </h2>
+          <p className="mt-3 text-base text-forge-muted leading-relaxed">
+            Practice by writing real queries on realistic company schemas, receiving immediate feedback and test validation.
           </p>
         </div>
 
-        {/* Asymmetrical Industrial Feature Grid */}
-        <div className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* Card 1: In-Browser Execution */}
-          <div className="group relative border border-forge-border bg-forge-card p-8 transition-colors hover:border-forge-accent/60">
-            <div className="flex items-center justify-between font-['JetBrains_Mono'] text-xs text-forge-muted">
-              <span>FEATURE_01</span>
-              <span className="text-forge-accent">[NO SETUP NEEDED]</span>
-            </div>
-            <h3 className="mt-6 font-['Space_Grotesk'] text-xl font-bold text-forge-text">
+        <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="rounded-2xl border border-forge-border bg-forge-card p-6 shadow-xs hover:border-forge-accent/60 transition-colors">
+            <h3 className="font-['Space_Grotesk'] text-lg font-bold text-forge-text">
               Run Real SQL in Your Browser
             </h3>
-            <p className="mt-3 font-['Inter'] text-sm leading-relaxed text-forge-muted">
-              Start typing SQL immediately. You don't need to install MySQL, configure Docker, or
-              deal with messy database connection errors.
+            <p className="mt-2 text-sm text-forge-muted leading-relaxed">
+              Start typing SQL immediately. No need to install database servers, configure Docker, or troubleshoot connection strings.
             </p>
-            <div className="mt-6 border-t border-forge-border pt-4 font-['JetBrains_Mono'] text-[11px] text-forge-muted">
-              INSTANT RESULTS // ZERO INSTALLATION
-            </div>
           </div>
 
-          {/* Card 2: Interview Questions */}
-          <div className="group relative border border-forge-border bg-forge-card p-8 transition-colors hover:border-forge-accent/60">
-            <div className="flex items-center justify-between font-['JetBrains_Mono'] text-xs text-forge-muted">
-              <span>FEATURE_02</span>
-              <span className="text-forge-success">[INTERVIEW-READY]</span>
-            </div>
-            <h3 className="mt-6 font-['Space_Grotesk'] text-xl font-bold text-forge-text">
-              Real Tech Company Interview Questions
+          <div className="rounded-2xl border border-forge-border bg-forge-card p-6 shadow-xs hover:border-forge-accent/60 transition-colors">
+            <h3 className="font-['Space_Grotesk'] text-lg font-bold text-forge-text">
+              Real Tech Interview Questions
             </h3>
-            <p className="mt-3 font-['Inter'] text-sm leading-relaxed text-forge-muted">
-              Practice the exact SQL questions asked by top tech companies. Learn how to handle
-              tricky cases like missing data, duplicate rows, and tied rankings.
+            <p className="mt-2 text-sm text-forge-muted leading-relaxed">
+              Practice questions asked by top tech teams. Learn how to handle tricky edge cases like NULLs, duplicate rows, and tied rankings.
             </p>
-            <div className="mt-6 border-t border-forge-border pt-4 font-['JetBrains_Mono'] text-[11px] text-forge-muted">
-              COVERS: JOINS, CTEs, WINDOW FUNCTIONS & AGGREGATES
-            </div>
           </div>
 
-          {/* Card 3: Query Speed & Cost */}
-          <div className="group relative border border-forge-border bg-forge-card p-8 transition-colors hover:border-forge-accent/60">
-            <div className="flex items-center justify-between font-['JetBrains_Mono'] text-xs text-forge-muted">
-              <span>FEATURE_03</span>
-              <span className="text-forge-accent">[SPEED & OPTIMIZATION]</span>
-            </div>
-            <h3 className="mt-6 font-['Space_Grotesk'] text-xl font-bold text-forge-text">
-              Learn How to Write Faster Queries
+          <div className="rounded-2xl border border-forge-border bg-forge-card p-6 shadow-xs hover:border-forge-accent/60 transition-colors">
+            <h3 className="font-['Space_Grotesk'] text-lg font-bold text-forge-text">
+              Query Speed & Performance
             </h3>
-            <p className="mt-3 font-['Inter'] text-sm leading-relaxed text-forge-muted">
-              Writing a query that works is good. Writing one that runs fast is even better. See
-              execution time and understand how indexes make your queries quicker.
+            <p className="mt-2 text-sm text-forge-muted leading-relaxed">
+              See execution times and understand how indexes, joins, and filters impact query performance at scale.
             </p>
-            <div className="mt-6 border-t border-forge-border pt-4 font-['JetBrains_Mono'] text-[11px] text-forge-muted">
-              UNDERSTAND: INDEXES // SCAN TYPES // EXECUTION TIME
-            </div>
           </div>
 
-          {/* Card 4: Multi-Dialect Support */}
-          <div className="group relative border border-forge-border bg-forge-card p-8 transition-colors hover:border-forge-accent/60">
-            <div className="flex items-center justify-between font-['JetBrains_Mono'] text-xs text-forge-muted">
-              <span>FEATURE_04</span>
-              <span className="text-forge-muted">[POPULAR ENGINES]</span>
-            </div>
-            <h3 className="mt-6 font-['Space_Grotesk'] text-xl font-bold text-forge-text">
-              PostgreSQL, MySQL & More
+          <div className="rounded-2xl border border-forge-border bg-forge-card p-6 shadow-xs hover:border-forge-accent/60 transition-colors">
+            <h3 className="font-['Space_Grotesk'] text-lg font-bold text-forge-text">
+              Multi-Dialect Support
             </h3>
-            <p className="mt-3 font-['Inter'] text-sm leading-relaxed text-forge-muted">
-              Switch easily between different SQL dialects with one click so you are comfortable no
-              matter which database your future team uses.
+            <p className="mt-2 text-sm text-forge-muted leading-relaxed">
+              Switch easily between PostgreSQL, MySQL, DuckDB, and SQLite with one click so you feel comfortable with any stack.
             </p>
-            <div className="mt-6 border-t border-forge-border pt-4 font-['JetBrains_Mono'] text-[11px] text-forge-muted">
-              SUPPORTED: POSTGRESQL // MYSQL // DUCKDB
-            </div>
           </div>
 
-          {/* Card 5: Real-World Datasets (Spans 2 cols on lg) */}
-          <div className="group relative border border-forge-border bg-forge-card p-8 transition-colors hover:border-forge-accent/60 md:col-span-2 lg:col-span-2">
-            <div className="flex items-center justify-between font-['JetBrains_Mono'] text-xs text-forge-muted">
-              <span>FEATURE_05</span>
-              <span className="text-forge-accent">[PRACTICAL DATA]</span>
-            </div>
-            <h3 className="mt-6 font-['Space_Grotesk'] text-xl font-bold text-forge-text">
-              Practical Company Datasets (Not Toy Examples)
+          <div className="rounded-2xl border border-forge-border bg-forge-card p-6 shadow-xs hover:border-forge-accent/60 transition-colors lg:col-span-2">
+            <h3 className="font-['Space_Grotesk'] text-lg font-bold text-forge-text">
+              Realistic Enterprise Schemas
             </h3>
-            <p className="mt-3 font-['Inter'] text-sm leading-relaxed text-forge-muted">
-              Instead of tiny tables with three rows, practice on realistic business data: user
-              subscriptions, payments, e-commerce orders, and web activity logs.
+            <p className="mt-2 text-sm text-forge-muted leading-relaxed">
+              Explore interconnected relational databases with real-world tables: employees, departments, orders, customers, reviews, and payment ledgers.
             </p>
-            <div className="mt-6 flex flex-wrap gap-3 font-['JetBrains_Mono'] text-xs">
-              <span className="border border-forge-border bg-forge-surface px-2.5 py-1 text-forge-muted">
-                #CUSTOMER_ORDERS
-              </span>
-              <span className="border border-forge-border bg-forge-surface px-2.5 py-1 text-forge-muted">
-                #MONTHLY_PAYMENTS
-              </span>
-              <span className="border border-forge-border bg-forge-surface px-2.5 py-1 text-forge-muted">
-                #APP_ANALYTICS
-              </span>
-            </div>
           </div>
         </div>
       </section>
 
       {/* ========================================================================= */}
-      {/* SECTION 02: INTERACTIVE PRACTICE DRILLS                                    */}
+      {/* PRACTICE DRILLS SECTION                                                   */}
       {/* ========================================================================= */}
-      <section id="practice" className="relative z-10 border-t border-forge-border bg-forge-surface/40 py-24">
+      <section id="practice" className="relative z-10 border-t border-forge-border bg-forge-surface/40 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 font-['JetBrains_Mono'] text-xs font-semibold uppercase tracking-widest text-forge-accent">
-                <span>// 02 PRACTICE DRILLS</span>
-                <span className="text-forge-border">|</span>
-                <span className="text-forge-muted">SAMPLE QUESTIONS</span>
+              <div className="text-xs font-semibold uppercase tracking-wider text-forge-accent">
+                Sample Practice Drills
               </div>
-              <h2 className="mt-3 font-['Space_Grotesk'] text-3xl font-bold tracking-tight text-forge-text sm:text-5xl">
-                SEE WHAT YOU WILL PRACTICE.
+              <h2 className="mt-2 font-['Space_Grotesk'] text-3xl font-bold tracking-tight text-forge-text sm:text-4xl">
+                See what you will practice.
               </h2>
             </div>
-            <div className="mt-4 font-['JetBrains_Mono'] text-xs text-forge-muted md:mt-0">
-              CLICK A TAB TO VIEW THE QUESTION, QUERY & OUTPUT
+            <div className="text-xs text-forge-muted">
+              Select a category tab to inspect the query and expected output
             </div>
           </div>
 
           {/* Drill Category Tabs */}
-          <div className="mt-10 flex flex-wrap gap-2 border-b border-forge-border pb-4">
+          <div className="mt-8 flex flex-wrap gap-2 border-b border-forge-border pb-4">
             {CHALLENGES.map((challenge, index) => (
               <button
                 key={challenge.id}
                 type="button"
                 onClick={() => setSelectedDrillIndex(index)}
-                className={`flex items-center gap-3 border px-4 py-2.5 font-['JetBrains_Mono'] text-xs uppercase tracking-wider transition-all ${
+                className={`flex items-center gap-2 rounded-lg border px-3.5 py-2 text-xs font-medium transition-all cursor-pointer ${
                   selectedDrillIndex === index
-                    ? 'border-forge-accent bg-forge-card text-forge-accent shadow-sm'
+                    ? 'border-forge-accent bg-forge-card text-forge-accent font-semibold shadow-xs'
                     : 'border-forge-border bg-forge-surface text-forge-muted hover:text-forge-text'
                 }`}
               >
-                <span className="text-[10px] opacity-60">0{index + 1}.</span>
                 <span>{challenge.category}</span>
                 <span
-                  className={`text-[10px] px-1.5 py-0.2 border ${
-                    challenge.difficulty === 'HARD'
+                  className={`rounded-full px-2 py-0.5 text-[10px] font-semibold border ${
+                    challenge.difficulty === 'Hard'
                       ? 'border-forge-accent/40 text-forge-accent'
-                      : 'border-forge-success/40 text-forge-success'
+                      : 'border-yellow-500/40 text-yellow-500'
                   }`}
                 >
                   {challenge.difficulty}
@@ -643,71 +488,63 @@ function LandingPage() {
           </div>
 
           {/* Drill Workbench View */}
-          <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-12">
-            {/* Left: Challenge Metadata & Prompt (5 cols) */}
-            <div className="flex flex-col justify-between border border-forge-border bg-forge-card p-6 lg:col-span-5">
+          <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-12">
+            {/* Left Card */}
+            <div className="flex flex-col justify-between rounded-2xl border border-forge-border bg-forge-card p-6 lg:col-span-5 shadow-xs">
               <div>
-                <div className="flex items-center justify-between border-b border-forge-border pb-3">
-                  <span className="font-['JetBrains_Mono'] text-xs text-forge-muted">
-                    QUESTION #{currentDrill.id}
-                  </span>
-                  <span className="font-['JetBrains_Mono'] text-xs text-forge-accent">
-                    TIME LIMIT: {currentDrill.runtimeLimit}
-                  </span>
+                <div className="flex items-center justify-between text-xs text-forge-muted border-b border-forge-border pb-3">
+                  <span>Question #{currentDrill.id}</span>
+                  <span className="text-forge-accent font-mono">Limit: {currentDrill.runtimeLimit}</span>
                 </div>
 
-                <h3 className="mt-4 font-['Space_Grotesk'] text-2xl font-bold text-forge-text">
+                <h3 className="mt-4 font-['Space_Grotesk'] text-xl font-bold text-forge-text">
                   {currentDrill.title}
                 </h3>
 
-                <p className="mt-3 font-['Inter'] text-sm leading-relaxed text-forge-muted">
+                <p className="mt-3 text-sm text-forge-muted leading-relaxed">
                   {currentDrill.description}
                 </p>
 
-                <div className="mt-6 border border-forge-border bg-forge-card-alt p-4">
-                  <div className="font-['JetBrains_Mono'] text-[10px] uppercase tracking-wider text-forge-accent">
-                    TABLE STRUCTURE
+                <div className="mt-6 rounded-xl border border-forge-border bg-forge-card-alt p-4">
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-forge-accent">
+                    Target Tables
                   </div>
-                  <div className="mt-1 font-['JetBrains_Mono'] text-xs text-forge-text">
+                  <div className="mt-1 font-mono text-xs text-forge-text">
                     {currentDrill.schema}
                   </div>
                 </div>
               </div>
 
-              <div className="mt-8 border-t border-forge-border pt-4">
+              <div className="mt-8 pt-4 border-t border-forge-border">
                 <Link
                   to="/signup"
-                  className="inline-flex w-full items-center justify-center gap-2 border border-forge-accent bg-forge-accent py-3 font-['JetBrains_Mono'] text-xs font-bold uppercase tracking-wider text-[#101114] hover:bg-forge-accent-hover"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-forge-accent bg-forge-accent py-2.5 text-xs font-semibold text-[#101114] hover:bg-forge-accent-hover transition-colors"
                 >
-                  <span>TRY THIS QUESTION IN LIVE EDITOR</span>
-                  <span>↗</span>
+                  <span>Solve This in Live Sandbox</span>
+                  <span aria-hidden="true">→</span>
                 </Link>
               </div>
             </div>
 
-            {/* Right: Code & Execution Output (7 cols) */}
-            <div className="border border-forge-border bg-forge-card lg:col-span-7">
-              {/* File Bar */}
-              <div className="flex items-center justify-between border-b border-forge-border bg-forge-card-alt px-4 py-2 font-['JetBrains_Mono'] text-xs">
+            {/* Right Card */}
+            <div className="rounded-2xl border border-forge-border bg-forge-card lg:col-span-7 overflow-hidden shadow-xs">
+              <div className="flex items-center justify-between border-b border-forge-border bg-forge-card-alt px-4 py-2 text-xs font-mono">
                 <span className="text-forge-text">{currentDrill.file}</span>
                 <span className="text-forge-success">{currentDrill.dialect}</span>
               </div>
 
-              {/* SQL Snippet (Dark Code Terminal) */}
-              <div className="overflow-x-auto bg-[#101114] p-4 font-['JetBrains_Mono'] text-xs leading-6 text-[#F4F1EA]">
+              <div className="overflow-x-auto bg-[#101114] p-4 font-mono text-xs leading-6 text-[#F4F1EA]">
                 <pre className="whitespace-pre-wrap">{currentDrill.sql}</pre>
               </div>
 
-              {/* Output Header */}
-              <div className="flex items-center justify-between border-y border-forge-border bg-forge-card-alt px-4 py-2 font-['JetBrains_Mono'] text-xs">
-                <span className="text-forge-success">
-                  ✓ QUERY COMPLETED IN {currentDrill.stats.executionTime}
+              <div className="flex items-center justify-between border-y border-forge-border bg-forge-card-alt px-4 py-2 text-xs">
+                <span className="text-forge-success font-semibold">
+                  ✓ Execution Time: {currentDrill.stats.executionTime}
                 </span>
-                <span className="text-forge-muted">SPEED: {currentDrill.stats.costScore}</span>
+                <span className="text-forge-muted">Rating: {currentDrill.stats.costScore}</span>
               </div>
 
-              {/* Output Rows */}
-              <div className="overflow-x-auto bg-forge-card p-4 font-['JetBrains_Mono'] text-xs">
+              <div className="overflow-x-auto p-4 font-mono text-xs">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="border-b border-forge-border text-[10px] uppercase text-forge-muted">
@@ -736,212 +573,102 @@ function LandingPage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* SECTION 03: 3-STEP LEARNING METHODOLOGY                                    */}
+      {/* HOW IT WORKS SECTION                                                      */}
       {/* ========================================================================= */}
-      <section id="how-it-works" className="relative z-10 mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+      <section id="how-it-works" className="relative z-10 mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div>
-          <div className="flex items-center gap-2 font-['JetBrains_Mono'] text-xs font-semibold uppercase tracking-widest text-forge-accent">
-            <span>// 03 HOW IT WORKS</span>
-            <span className="text-forge-border">|</span>
-            <span className="text-forge-muted">3 SIMPLE STEPS</span>
+          <div className="text-xs font-semibold uppercase tracking-wider text-forge-accent">
+            How It Works
           </div>
-          <h2 className="mt-3 font-['Space_Grotesk'] text-3xl font-bold tracking-tight text-forge-text sm:text-5xl">
-            HOW YOU BUILD SQL CONFIDENCE.
+          <h2 className="mt-2 font-['Space_Grotesk'] text-3xl font-bold tracking-tight text-forge-text sm:text-4xl">
+            Build SQL confidence in 3 steps.
           </h2>
-          <p className="mt-4 max-w-xl font-['Inter'] text-sm leading-relaxed text-forge-muted">
-            A simple, repeatable process to take you from learning syntax to solving tough
-            interview questions on your own.
+          <p className="mt-3 max-w-xl text-base text-forge-muted">
+            A simple process to help you progress from basic queries to solving advanced interview questions.
           </p>
         </div>
 
-        <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3">
-          {/* Step 01 */}
-          <div className="relative border border-forge-border bg-forge-card p-8">
-            <div className="font-['Space_Grotesk'] text-5xl font-extrabold text-forge-border">
+        <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="rounded-2xl border border-forge-border bg-forge-card p-6 shadow-xs">
+            <div className="font-['Space_Grotesk'] text-4xl font-extrabold text-forge-border">
               01
             </div>
-            <div className="mt-4 font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-forge-accent">
-              STEP 1: UNDERSTAND
+            <div className="mt-3 text-xs font-semibold uppercase tracking-wider text-forge-accent">
+              Step 1: Understand
             </div>
-            <h3 className="mt-2 font-['Space_Grotesk'] text-xl font-bold text-forge-text">
+            <h3 className="mt-1 font-['Space_Grotesk'] text-lg font-bold text-forge-text">
               Read the Problem & Tables
             </h3>
-            <p className="mt-3 font-['Inter'] text-sm leading-relaxed text-forge-muted">
-              Review the question, see what columns are available in each table, and understand
-              what the final answer should look like.
+            <p className="mt-2 text-sm text-forge-muted leading-relaxed">
+              Review the question specs, inspect available table columns and foreign keys, and understand what output is expected.
             </p>
-            <div className="mt-6 border-t border-forge-border pt-3 font-['JetBrains_Mono'] text-[11px] text-forge-muted">
-              GOAL: CLEAR PROBLEM UNDERSTANDING
-            </div>
           </div>
 
-          {/* Step 02 */}
-          <div className="relative border border-forge-border bg-forge-card p-8">
-            <div className="font-['Space_Grotesk'] text-5xl font-extrabold text-forge-border">
+          <div className="rounded-2xl border border-forge-border bg-forge-card p-6 shadow-xs">
+            <div className="font-['Space_Grotesk'] text-4xl font-extrabold text-forge-border">
               02
             </div>
-            <div className="mt-4 font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-forge-accent">
-              STEP 2: WRITE & RUN
+            <div className="mt-3 text-xs font-semibold uppercase tracking-wider text-forge-accent">
+              Step 2: Write & Run
             </div>
-            <h3 className="mt-2 font-['Space_Grotesk'] text-xl font-bold text-forge-text">
-              Write and Test Your Query
+            <h3 className="mt-1 font-['Space_Grotesk'] text-lg font-bold text-forge-text">
+              Write and Test Queries
             </h3>
-            <p className="mt-3 font-['Inter'] text-sm leading-relaxed text-forge-muted">
-              Write your query in our built-in editor with helpful syntax highlighting. Hit "Run" at
-              any time to inspect intermediate results.
+            <p className="mt-2 text-sm text-forge-muted leading-relaxed">
+              Type your query in the built-in editor with syntax highlighting. Hit "Run Query" anytime to view intermediate outputs.
             </p>
-            <div className="mt-6 border-t border-forge-border pt-3 font-['JetBrains_Mono'] text-[11px] text-forge-muted">
-              GOAL: IMMEDIATE FEEDBACK
-            </div>
           </div>
 
-          {/* Step 03 */}
-          <div className="relative border border-forge-border bg-forge-card p-8">
-            <div className="font-['Space_Grotesk'] text-5xl font-extrabold text-forge-border">
+          <div className="rounded-2xl border border-forge-border bg-forge-card p-6 shadow-xs">
+            <div className="font-['Space_Grotesk'] text-4xl font-extrabold text-forge-border">
               03
             </div>
-            <div className="mt-4 font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-forge-success">
-              STEP 3: PASS TESTS
+            <div className="mt-3 text-xs font-semibold uppercase tracking-wider text-forge-success">
+              Step 3: Verify
             </div>
-            <h3 className="mt-2 font-['Space_Grotesk'] text-xl font-bold text-forge-text">
-              Verify Against Tricky Edge Cases
+            <h3 className="mt-1 font-['Space_Grotesk'] text-lg font-bold text-forge-text">
+              Pass Tricky Edge Cases
             </h3>
-            <p className="mt-3 font-['Inter'] text-sm leading-relaxed text-forge-muted">
-              Your query is tested against hidden test datasets containing empty values, duplicates,
-              and ties to make sure your solution is solid.
+            <p className="mt-2 text-sm text-forge-muted leading-relaxed">
+              Your solution is verified against datasets containing NULL values, duplicate keys, and ranking ties to ensure accuracy.
             </p>
-            <div className="mt-6 border-t border-forge-border pt-3 font-['JetBrains_Mono'] text-[11px] text-forge-muted">
-              GOAL: INTERVIEW READY
-            </div>
           </div>
         </div>
       </section>
 
       {/* ========================================================================= */}
-      {/* SECTION 04: CLEAR COMPARISON TABLE                                         */}
+      {/* FINAL CTA SECTION                                                         */}
       {/* ========================================================================= */}
-      <section id="platform" className="relative z-10 border-t border-forge-border bg-forge-surface/40 py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl">
-            <div className="flex items-center gap-2 font-['JetBrains_Mono'] text-xs font-semibold uppercase tracking-widest text-forge-accent">
-              <span>// 04 COMPARISON</span>
-              <span className="text-forge-border">|</span>
-              <span className="text-forge-muted">WHY CHOOSE SQLFORGE</span>
-            </div>
-            <h2 className="mt-3 font-['Space_Grotesk'] text-3xl font-bold tracking-tight text-forge-text sm:text-5xl">
-              WHY PRACTICE WITH US?
-            </h2>
-            <p className="mt-4 font-['Inter'] text-sm leading-relaxed text-forge-muted">
-              Here is how SQLForge compares to regular coding websites and passive video tutorials.
-            </p>
-          </div>
-
-          <div className="mt-12 overflow-x-auto border border-forge-border bg-forge-card">
-            <table className="w-full text-left font-['JetBrains_Mono'] text-xs">
-              <thead>
-                <tr className="border-b border-forge-border bg-forge-card-alt text-[11px] uppercase tracking-wider text-forge-muted">
-                  <th className="p-4">WHAT YOU GET</th>
-                  <th className="border-l border-forge-border p-4 text-forge-accent font-bold">
-                    SQLFORGE
-                  </th>
-                  <th className="border-l border-forge-border p-4">GENERIC CODING SITES</th>
-                  <th className="border-l border-forge-border p-4">VIDEO COURSES</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-forge-border text-forge-text">
-                <tr>
-                  <td className="p-4 font-semibold">Real Database Engine</td>
-                  <td className="border-l border-forge-border p-4 text-forge-success font-bold">
-                    ✓ Yes, runs real SQL
-                  </td>
-                  <td className="border-l border-forge-border p-4 text-forge-muted">Often simulated</td>
-                  <td className="border-l border-forge-border p-4 text-forge-muted">None (just watching)</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-semibold">Query Speed & Index Tips</td>
-                  <td className="border-l border-forge-border p-4 text-forge-success font-bold">
-                    ✓ Tells you if query is fast
-                  </td>
-                  <td className="border-l border-forge-border p-4 text-forge-muted">Only pass / fail</td>
-                  <td className="border-l border-forge-border p-4 text-forge-muted">Theory only</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-semibold">Multiple Database Flavors</td>
-                  <td className="border-l border-forge-border p-4 text-forge-success font-bold">
-                    ✓ PostgreSQL & MySQL
-                  </td>
-                  <td className="border-l border-forge-border p-4 text-forge-muted">Usually only one</td>
-                  <td className="border-l border-forge-border p-4 text-forge-muted">Depends on video</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-semibold">Tested on Tricky Edge Cases</td>
-                  <td className="border-l border-forge-border p-4 text-forge-success font-bold">
-                    ✓ Tests NULLs, ties & duplicates
-                  </td>
-                  <td className="border-l border-forge-border p-4 text-forge-muted">Only checks sample rows</td>
-                  <td className="border-l border-forge-border p-4 text-forge-muted">No hands-on tests</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-semibold">Real Tech Interview Questions</td>
-                  <td className="border-l border-forge-border p-4 text-forge-success font-bold">
-                    ✓ From real tech companies
-                  </td>
-                  <td className="border-l border-forge-border p-4 text-forge-muted">Random user questions</td>
-                  <td className="border-l border-forge-border p-4 text-forge-muted">General concepts</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* SECTION 05: TERMINAL CTA / GET STARTED                                    */}
-      {/* ========================================================================= */}
-      <section className="relative z-10 mx-auto max-w-7xl px-4 py-28 sm:px-6 lg:px-8">
-        <div className="relative border border-forge-border bg-forge-card p-8 sm:p-14 shadow-lg">
-          {/* Engineering grid accent inside card */}
-          <div className="pointer-events-none absolute inset-0 industrial-grid opacity-20" />
-
-          {/* Corner Notch Markers */}
-          <span className="absolute -top-1.5 -left-1.5 h-3 w-3 bg-forge-accent" />
-          <span className="absolute -bottom-1.5 -right-1.5 h-3 w-3 bg-forge-accent" />
-
-          <div className="relative z-10 max-w-3xl">
-            <div className="inline-flex items-center gap-2 border border-forge-border bg-forge-card-alt px-3 py-1 font-['JetBrains_Mono'] text-xs font-semibold uppercase tracking-widest text-forge-accent">
-              <span>READY TO PRACTICE?</span>
+      <section className="relative z-10 mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+        <div className="rounded-3xl border border-forge-border bg-forge-card p-8 sm:p-12 shadow-xl">
+          <div className="max-w-3xl">
+            <div className="text-xs font-semibold uppercase tracking-wider text-forge-accent">
+              Ready to Practice?
             </div>
 
-            <h2 className="mt-6 font-['Space_Grotesk'] text-4xl font-extrabold tracking-tight text-forge-text sm:text-6xl">
-              START PRACTICING SQL IN SECONDS.
+            <h2 className="mt-3 font-['Space_Grotesk'] text-3xl font-extrabold tracking-tight text-forge-text sm:text-5xl">
+              Start practicing SQL in seconds.
             </h2>
 
-            <p className="mt-4 font-['Inter'] text-base leading-relaxed text-forge-muted">
-              Pick a challenge, write your query, and see results right in your browser. No
-              downloads or credit card required.
+            <p className="mt-4 text-base text-forge-muted leading-relaxed">
+              Choose a challenge, write your query, and see instant results directly in your browser. Free forever, no credit card required.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
                 to="/signup"
-                className="group relative inline-flex items-center gap-3 border border-forge-accent bg-forge-accent px-8 py-4 font-['JetBrains_Mono'] text-sm font-bold uppercase tracking-wider text-[#101114] transition-all hover:bg-forge-accent-hover hover:border-forge-accent-hover"
+                className="inline-flex items-center gap-2 rounded-lg border border-forge-accent bg-forge-accent px-6 py-3 text-sm font-semibold text-[#101114] transition-all hover:bg-forge-accent-hover hover:border-forge-accent-hover shadow-xs"
               >
-                <span>CREATE FREE ACCOUNT</span>
-                <span className="text-base transition-transform duration-150 group-hover:translate-x-1 group-hover:-translate-y-1">
-                  ↗
-                </span>
+                <span>Create Free Account</span>
+                <span aria-hidden="true">→</span>
               </Link>
 
               <Link
                 to="/login"
-                className="inline-flex items-center gap-2 border border-forge-border bg-forge-surface px-7 py-4 font-['JetBrains_Mono'] text-sm font-semibold uppercase tracking-wider text-forge-text transition-colors hover:border-forge-muted hover:bg-forge-card-alt"
+                className="inline-flex items-center gap-2 rounded-lg border border-forge-border bg-forge-surface px-6 py-3 text-sm font-medium text-forge-text transition-colors hover:bg-forge-card-alt"
               >
-                <span>LOG IN TO PRACTICE</span>
+                <span>Log In</span>
               </Link>
-            </div>
-
-            <div className="mt-8 font-['JetBrains_Mono'] text-xs text-forge-muted">
-              FREE TO USE // IMMEDIATE ACCESS // NO INSTALLATION REQUIRED
             </div>
           </div>
         </div>

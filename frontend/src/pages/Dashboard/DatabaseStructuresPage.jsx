@@ -617,7 +617,7 @@ const FINTECH_DATABASE = {
 const ALL_DATABASES = [EMPLOYEES_DATABASE, ANALYTICS_DATABASE, FINTECH_DATABASE]
 
 function DatabaseStructuresPage() {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
 
   // Get active database directly from URL query param or localStorage
   const selectedDbId =
@@ -629,54 +629,22 @@ function DatabaseStructuresPage() {
 
   // Selected Table inside the database
   const [selectedTableId, setSelectedTableId] = useState('departments')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [activeDomainFilter, setActiveDomainFilter] = useState('ALL')
-  const [activeDetailTab, setActiveDetailTab] = useState('columns')
 
   const currentDb = useMemo(() => {
     return ALL_DATABASES.find((db) => db.id === selectedDbId) || EMPLOYEES_DATABASE
   }, [selectedDbId])
 
-  // Get unique domain categories for the current database
-  const domainFilters = useMemo(() => {
-    if (!currentDb.tables) return ['ALL']
-    const domains = Array.from(new Set(currentDb.tables.map((t) => t.domain)))
-    return ['ALL', ...domains]
-  }, [currentDb])
-
-  // Filter tables by domain and search query
+  // Filter tables for current database
   const filteredTables = useMemo(() => {
     if (!currentDb.tables) return []
-    return currentDb.tables.filter((table) => {
-      const matchesDomain = activeDomainFilter === 'ALL' || table.domain === activeDomainFilter
-      const query = searchQuery.toLowerCase().trim()
-      const matchesSearch =
-        !query ||
-        table.name.toLowerCase().includes(query) ||
-        table.description.toLowerCase().includes(query) ||
-        table.columns.some(
-          (c) => c.name.toLowerCase().includes(query) || c.type.toLowerCase().includes(query)
-        )
-      return matchesDomain && matchesSearch
-    })
-  }, [currentDb, activeDomainFilter, searchQuery])
+    return currentDb.tables
+  }, [currentDb])
 
   // Get current selected table, falling back to first table if not in currentDb
   const selectedTable = useMemo(() => {
     if (!currentDb.tables || currentDb.tables.length === 0) return null
     return currentDb.tables.find((t) => t.id === selectedTableId) || currentDb.tables[0]
   }, [currentDb, selectedTableId])
-
-  // Action: Switch database view & update URL
-  const handleSwitchDb = (dbId) => {
-    setSearchParams({ db: dbId })
-    const found = ALL_DATABASES.find((d) => d.id === dbId)
-    if (found && found.tables.length > 0) {
-      setSelectedTableId(found.tables[0].id)
-    }
-    setActiveDomainFilter('ALL')
-    setSearchQuery('')
-  }
 
   // Action: Select this database as the active execution environment
   const handleSelectDatabase = (dbId, dbName) => {
@@ -685,131 +653,69 @@ function DatabaseStructuresPage() {
     toast.success(`Active database switched to: ${dbName}! Ready for queries.`)
   }
 
-  // Copy helper
-  const handleCopySQL = (text, label) => {
-    navigator.clipboard.writeText(text)
-    toast.success(`${label} copied to clipboard!`)
-  }
-
-  // Generate CREATE TABLE DDL
-  const generateDDL = (table) => {
-    if (!table) return ''
-    const cols = table.columns.map((c) => {
-      let line = `  \`${c.name}\` ${c.type}`
-      if (c.null === 'NO') line += ' NOT NULL'
-      if (c.default !== 'NULL') line += ` DEFAULT ${c.default}`
-      if (c.key === 'PRI' && c.type.includes('INT') && c.default === 'AUTO_INCREMENT')
-        line += ' AUTO_INCREMENT'
-      return line
-    })
-
-    const pks = table.columns.filter((c) => c.key === 'PRI').map((c) => `\`${c.name}\``)
-    if (pks.length > 0) {
-      cols.push(`  PRIMARY KEY (${pks.join(', ')})`)
-    }
-
-    if (table.relationships) {
-      table.relationships.forEach((rel) => {
-        if (rel.references.includes('(')) {
-          cols.push(
-            `  CONSTRAINT \`fk_${table.name}_${rel.column}\` FOREIGN KEY (\`${rel.column}\`) REFERENCES ${rel.references}`
-          )
-        }
-      })
-    }
-
-    return `CREATE TABLE \`${table.name}\` (\n${cols.join(',\n')}\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`
-  }
-
   return (
     <div className="space-y-6">
-      {/* ========================================================================= */}
-      {/* 1. TOP HEADER & DATABASE SELECTOR BAR                                     */}
-      {/* ========================================================================= */}
-      <div className="border border-forge-border bg-forge-card p-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-          <div>
-            <h1 className="mt-1 font-['Space_Grotesk'] text-2xl sm:text-3xl font-extrabold tracking-tight text-forge-text">
-              DATABASE STRUCTURES
-            </h1>
-          </div>
-
-          
-        </div>
-
-        {/* Selected Database Overview Card */}
-        <div className="mt-6 border-t border-forge-border pt-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center border border-forge-border bg-forge-surface text-forge-accent">
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="square" strokeWidth="2" d="M4 6c0-1.5 3.5-2.5 8-2.5s8 1 8 2.5-3.5 2.5-8 2.5-8-1-8-2.5z" />
-                  <path strokeLinecap="square" strokeWidth="2" d="M4 6v6c0 1.5 3.5 2.5 8 2.5s8-1 8-2.5V6" />
-                  <path strokeLinecap="square" strokeWidth="2" d="M4 12v6c0 1.5 3.5 2.5 8 2.5s8-1 8-2.5v-6" />
-                </svg>
-              </div>
-
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="font-['Space_Grotesk'] text-lg font-bold text-forge-text">
-                    {currentDb.name}
-                  </h2>
-                  {activeDatabase === currentDb.id && (
-                    <span className="font-['JetBrains_Mono'] text-[10px] uppercase font-bold text-forge-success border border-forge-success/40 bg-forge-success/10 px-2 py-0.5">
-                      ✓ SELECTED WORKSPACE
-                    </span>
-                  )}
-                </div>
-                <p className="font-['Inter'] text-xs text-forge-muted mt-0.5">
-                  {currentDb.description}
-                </p>
-              </div>
+      {/* 1. TOP HEADER & DATABASE OVERVIEW CARD */}
+      <div className="rounded-2xl border border-forge-border bg-forge-card p-6 shadow-xs">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="flex items-start gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-forge-accent/10 border border-forge-accent/30 text-forge-accent">
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6c0-1.5 3.5-2.5 8-2.5s8 1 8 2.5-3.5 2.5-8 2.5-8-1-8-2.5z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6v6c0 1.5 3.5 2.5 8 2.5s8-1 8-2.5V6" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 12v6c0 1.5 3.5 2.5 8 2.5s8-1 8-2.5v-6" />
+              </svg>
             </div>
 
-            {/* "SELECT THIS DATABASE" Action Button */}
-            <div className="flex items-center gap-3 shrink-0">
-              <button
-                type="button"
-                onClick={() => handleSelectDatabase(currentDb.id, currentDb.name)}
-                className={`group relative inline-flex items-center gap-2 border px-5 py-2.5 font-['JetBrains_Mono'] text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                  activeDatabase === currentDb.id
-                    ? 'border-forge-success bg-forge-success/15 text-forge-success cursor-default'
-                    : 'border-forge-accent bg-forge-accent text-[#101114] hover:bg-forge-accent-hover hover:border-forge-accent-hover shadow-xs'
-                }`}
-              >
-                {activeDatabase === currentDb.id ? (
-                  <>
-                    <span>✓ DATABASE SELECTED</span>
-                    <span className="text-[10px] text-forge-success">● ACTIVE</span>
-                  </>
-                ) : (
-                  <>
-                    <span>SELECT THIS DATABASE</span>
-                    <span className="transition-transform duration-150 group-hover:translate-x-0.5">
-                      ↗
-                    </span>
-                    <span className="absolute -bottom-0.5 -right-0.5 h-1 w-1 bg-forge-bg" />
-                  </>
+            <div>
+              <div className="flex items-center gap-3">
+                <h1 className="font-['Space_Grotesk'] text-2xl font-bold tracking-tight text-forge-text">
+                  {currentDb.name}
+                </h1>
+                {activeDatabase === currentDb.id && (
+                  <span className="rounded-full bg-forge-success/15 border border-forge-success/40 px-2.5 py-0.5 text-xs font-semibold text-forge-success">
+                    Active Workspace
+                  </span>
                 )}
-              </button>
+              </div>
+              <p className="mt-1 text-sm text-forge-muted max-w-2xl leading-relaxed">
+                {currentDb.description}
+              </p>
+              <div className="mt-2.5 flex items-center gap-3 text-xs text-forge-muted">
+                <span>{currentDb.totalTables} Tables</span>
+                <span>•</span>
+                <span>{currentDb.engine}</span>
+                <span>•</span>
+                <span>{currentDb.collation}</span>
+              </div>
             </div>
           </div>
 
-          
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              type="button"
+              onClick={() => handleSelectDatabase(currentDb.id, currentDb.name)}
+              className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all cursor-pointer ${
+                activeDatabase === currentDb.id
+                  ? 'border border-forge-success bg-forge-success/15 text-forge-success cursor-default'
+                  : 'border border-forge-accent bg-forge-accent text-[#101114] hover:bg-forge-accent-hover hover:border-forge-accent-hover shadow-xs'
+              }`}
+            >
+              {activeDatabase === currentDb.id ? '✓ Selected Database' : 'Select This Database'}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* ========================================================================= */}
-      {/* 3. MASTER-DETAIL SPLIT: Table Catalog & Schema Inspector                  */}
-      {/* ========================================================================= */}
+      {/* 2. MASTER-DETAIL SPLIT: Table Catalog & Schema Inspector */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left: Table List Sidebar (4 cols) */}
-        <div className="border border-forge-border bg-forge-card lg:col-span-4 overflow-hidden">
-          <div className="border-b border-forge-border bg-forge-card-alt px-4 py-3 flex items-center justify-between">
-            <span className="font-['JetBrains_Mono'] text-xs font-semibold uppercase text-forge-text">
-              TABLES ({filteredTables.length})
+        <div className="rounded-xl border border-forge-border bg-forge-card lg:col-span-4 overflow-hidden shadow-xs">
+          <div className="border-b border-forge-border bg-forge-card-alt/50 px-4 py-3 flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-forge-text">
+              Tables ({filteredTables.length})
             </span>
-            
+            <span className="text-[11px] text-forge-muted">Click to view columns</span>
           </div>
 
           <div className="max-h-[640px] overflow-y-auto divide-y divide-forge-border/60">
@@ -819,115 +725,116 @@ function DatabaseStructuresPage() {
                 <button
                   key={table.id}
                   type="button"
-                  onClick={() => {
-                    setSelectedTableId(table.id)
-                    setActiveDetailTab('columns')
-                  }}
-                  className={`w-full text-left p-3.5 transition-all flex items-start justify-between gap-2 cursor-pointer ${
+                  onClick={() => setSelectedTableId(table.id)}
+                  className={`w-full text-left p-3.5 transition-colors flex items-center justify-between cursor-pointer ${
                     isSelected
-                      ? 'border-l-4 border-forge-accent bg-forge-card-alt text-forge-text'
-                      : 'border-l-4 border-transparent hover:bg-forge-surface/60 text-forge-muted hover:text-forge-text'
+                      ? 'bg-forge-accent/10 text-forge-text font-semibold border-l-3 border-forge-accent'
+                      : 'hover:bg-forge-card-alt/60 text-forge-muted hover:text-forge-text border-l-3 border-transparent'
                   }`}
                 >
-                  <div className="truncate">
-                    <div className="flex items-center gap-2">
-                      <span className="font-['JetBrains_Mono'] text-xs font-bold text-forge-text">
-                        {table.name}
-                      </span>
-                      {isSelected && (
-                        <span className="h-1.5 w-1.5 rounded-full bg-forge-accent" />
-                      )}
-                    </div>
+                  <div className="flex items-center gap-2.5 truncate">
+                    <span className="font-mono text-xs font-semibold text-forge-text">
+                      {table.name}
+                    </span>
                   </div>
+                  <span className="text-[11px] text-forge-muted font-mono">
+                    {table.columns.length} cols
+                  </span>
                 </button>
               )
             })}
 
             {filteredTables.length === 0 && (
-              <div className="p-8 text-center font-['JetBrains_Mono'] text-xs text-forge-muted">
-                NO TABLES FOUND MATCHING "{searchQuery}"
+              <div className="p-8 text-center text-xs text-forge-muted">
+                No tables found in this database
               </div>
             )}
           </div>
         </div>
 
-        {/* Right: Table Inspector & Tabs (8 cols) */}
+        {/* Right: Table Inspector & Columns (8 cols) */}
         {selectedTable ? (
-          <div className="border border-forge-border bg-forge-card lg:col-span-8 overflow-hidden">
+          <div className="rounded-xl border border-forge-border bg-forge-card lg:col-span-8 overflow-hidden shadow-xs">
             {/* Table Header Bar */}
-            <div className="border-b border-forge-border bg-forge-card-alt p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="border-b border-forge-border bg-forge-card-alt/50 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <div className="flex items-center gap-2 font-['JetBrains_Mono'] text-[10px] uppercase tracking-wider text-forge-muted">
-                  <span>TABLE: {selectedTable.domain}</span>
-                  
+                <div className="text-xs font-medium uppercase tracking-wider text-forge-muted">
+                  Domain: {selectedTable.domain}
                 </div>
-                <h3 className="font-['Space_Grotesk'] text-2xl font-bold text-forge-text mt-0.5 flex items-center gap-2">
-                  <span className="text-forge-accent">`</span>
-                  <span>{selectedTable.name}</span>
-                  <span className="text-forge-accent">`</span>
-                </h3>
-                
+                <h2 className="font-['Space_Grotesk'] text-xl font-bold text-forge-text mt-1 flex items-center gap-2">
+                  <span className="font-mono text-forge-accent">`{selectedTable.name}`</span>
+                </h2>
+                {selectedTable.description && (
+                  <p className="mt-1 text-xs text-forge-muted max-w-xl">
+                    {selectedTable.description}
+                  </p>
+                )}
+              </div>
+
+              <div className="text-xs text-forge-muted shrink-0">
+                <span className="font-semibold text-forge-text">{selectedTable.columns.length}</span> columns
               </div>
             </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left font-['JetBrains_Mono'] text-xs">
-                  <thead>
-                    <tr className="border-b border-forge-border bg-forge-card-alt text-[10px] uppercase text-forge-muted">
-                      <th className="p-3.5">COLUMN NAME</th>
-                      <th className="p-3.5">DATA TYPE</th>
-                      <th className="p-3.5">KEY</th>
-                      <th className="p-3.5">NULLABLE</th>
-                      <th className="p-3.5">DEFAULT</th>
-                      <th className="p-3.5">DESCRIPTION</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-forge-border text-forge-text">
-                    {selectedTable.columns.map((col) => (
-                      <tr key={col.name} className="hover:bg-forge-card-alt/40 transition-colors">
-                        <td className="p-3.5 font-bold text-forge-text flex items-center gap-2">
-                          <span>{col.name}</span>
-                          {col.key === 'PRI' && (
-                            <span className="text-[9px] px-1 bg-forge-accent/20 text-forge-accent border border-forge-accent/40 font-bold">
-                              PK
-                            </span>
-                          )}
-                          {col.key === 'MUL' && (
-                            <span className="text-[9px] px-1 bg-[#38BDF8]/20 text-[#38BDF8] border border-[#38BDF8]/40 font-bold">
-                              FK
-                            </span>
-                          )}
-                          {col.key === 'UNI' && (
-                            <span className="text-[9px] px-1 bg-forge-success/20 text-forge-success border border-forge-success/40 font-bold">
-                              UNI
-                            </span>
-                          )}
-                        </td>
-                        <td className="p-3.5 text-[#38BDF8]">{col.type}</td>
-                        <td className="p-3.5 text-forge-muted">{col.key || '-'}</td>
-                        <td className="p-3.5">
-                          <span
-                            className={
-                              col.null === 'NO'
-                                ? 'text-forge-accent font-semibold'
-                                : 'text-forge-muted'
-                            }
-                          >
-                            {col.null}
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-forge-border bg-forge-card-alt/30 text-[11px] font-semibold uppercase tracking-wider text-forge-muted">
+                    <th className="p-3.5">Column Name</th>
+                    <th className="p-3.5">Data Type</th>
+                    <th className="p-3.5">Key</th>
+                    <th className="p-3.5">Nullable</th>
+                    <th className="p-3.5">Default</th>
+                    <th className="p-3.5">Description</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-forge-border text-forge-text">
+                  {selectedTable.columns.map((col) => (
+                    <tr key={col.name} className="hover:bg-forge-card-alt/40 transition-colors">
+                      <td className="p-3.5 font-mono font-semibold text-forge-text flex items-center gap-2">
+                        <span>{col.name}</span>
+                        {col.key === 'PRI' && (
+                          <span className="rounded px-1.5 py-0.5 text-[10px] font-bold bg-forge-accent/15 text-forge-accent border border-forge-accent/30">
+                            PK
                           </span>
-                        </td>
-                        <td className="p-3.5 text-forge-muted">{col.default}</td>
-                        <td className="p-3.5 font-['Inter'] text-[11px] text-forge-muted max-w-xs">
-                          {col.desc}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                        )}
+                        {col.key === 'MUL' && (
+                          <span className="rounded px-1.5 py-0.5 text-[10px] font-bold bg-sky-500/15 text-sky-500 border border-sky-500/30">
+                            FK
+                          </span>
+                        )}
+                        {col.key === 'UNI' && (
+                          <span className="rounded px-1.5 py-0.5 text-[10px] font-bold bg-forge-success/15 text-forge-success border border-forge-success/30">
+                            UNI
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-3.5 font-mono text-sky-400">{col.type}</td>
+                      <td className="p-3.5 font-mono text-forge-muted">{col.key || '-'}</td>
+                      <td className="p-3.5">
+                        <span
+                          className={
+                            col.null === 'NO'
+                              ? 'text-forge-accent font-medium'
+                              : 'text-forge-muted'
+                          }
+                        >
+                          {col.null}
+                        </span>
+                      </td>
+                      <td className="p-3.5 font-mono text-forge-muted">{col.default}</td>
+                      <td className="p-3.5 text-xs text-forge-muted max-w-xs">
+                        {col.desc}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         ) : (
-          <div className="border border-forge-border bg-forge-card p-12 text-center text-forge-muted font-['JetBrains_Mono'] text-xs lg:col-span-8">
-            SELECT A TABLE FROM THE LEFT CATALOG TO INSPECT DETAILS.
+          <div className="rounded-xl border border-forge-border bg-forge-card p-12 text-center text-xs text-forge-muted lg:col-span-8">
+            Select a table from the left list to inspect columns.
           </div>
         )}
       </div>

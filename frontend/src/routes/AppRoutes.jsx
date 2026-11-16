@@ -6,6 +6,7 @@ import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
 import DashboardHome from "../pages/Dashboard/DashboardHome";
 import DatabaseStructuresPage from "../pages/Dashboard/DatabaseStructuresPage";
+import PracticeMySQLPage from "../pages/Dashboard/PracticeMySQLPage";
 import ProtectedRoute from "./ProtectedRoute";
 
 const AppRoutes = () => {
@@ -23,7 +24,8 @@ const AppRoutes = () => {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<DashboardHome />} />
           <Route path="structures" element={<DatabaseStructuresPage />} />
-          <Route path="drills" element={<DashboardHome />} />
+          <Route path="drills" element={<PracticeMySQLPage />} />
+          <Route path="practice" element={<PracticeMySQLPage />} />
           <Route path="editor" element={<DashboardHome />} />
           <Route path="learn" element={<DashboardHome />} />
           <Route path="submissions" element={<DashboardHome />} />

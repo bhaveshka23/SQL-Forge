@@ -2,65 +2,63 @@ import { Link } from 'react-router-dom'
 
 function DashboardHome() {
   const metrics = [
-    { label: 'QUERIES EXECUTED', value: '142', change: '+12 today', status: 'optimal' },
-    { label: 'DRILLS SOLVED', value: '28 / 500', change: '5.6% complete', status: 'neutral' },
-    { label: 'AVERAGE LATENCY', value: '14.2ms', change: 'WASM engine', status: 'optimal' },
-    { label: 'ACCURACY SCORE', value: '94.8%', change: 'Top 8%', status: 'optimal' },
+    { label: 'Queries Executed', value: '142', change: '+12 today' },
+    { label: 'Problems Solved', value: '28 / 500', change: '5.6% completed' },
+    { label: 'Average Speed', value: '14.2ms', change: 'In-browser engine' },
+    { label: 'Accuracy Score', value: '94.8%', change: 'Top 8% rank' },
   ]
 
   const recentDrills = [
     {
       id: '01',
       title: 'Top 3 Performers by Department',
-      category: 'WINDOW FUNCTIONS',
-      difficulty: 'MEDIUM',
-      status: 'SOLVED',
+      category: 'Window Functions',
+      difficulty: 'Medium',
+      status: 'Solved',
       time: '2 hours ago',
     },
     {
       id: '02',
       title: 'Management Hierarchy Tree Traversal',
-      category: 'RECURSIVE CTE',
-      difficulty: 'HARD',
-      status: 'IN PROGRESS',
+      category: 'Recursive CTEs',
+      difficulty: 'Hard',
+      status: 'In Progress',
       time: 'Yesterday',
     },
     {
       id: '03',
       title: '30-Minute Inactivity Window Flagging',
-      category: 'SESSIONIZATION',
-      difficulty: 'HARD',
-      status: 'QUEUED',
+      category: 'Sessionization',
+      difficulty: 'Hard',
+      status: 'Not Started',
       time: '2 days ago',
     },
   ]
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Top Banner */}
-      <div className="relative border border-forge-border bg-forge-card p-6 sm:p-8">
+      <div className="rounded-2xl border border-forge-border bg-forge-card p-6 sm:p-8 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 font-['JetBrains_Mono'] text-xs font-semibold uppercase tracking-widest text-forge-accent">
-              <span>WORKSPACE</span>
-              <span className="text-forge-border">|</span>
-              
+            <div className="text-xs font-semibold uppercase tracking-wider text-forge-accent">
+              Workspace Overview
             </div>
-            <h1 className="mt-2 font-['Space_Grotesk'] text-2xl sm:text-3xl font-extrabold tracking-tight text-forge-text">
-              WELCOME BACK, ENGINEER_01.
+            <h1 className="mt-1 font-['Space_Grotesk'] text-2xl sm:text-3xl font-bold tracking-tight text-forge-text">
+              Welcome back, Engineer
             </h1>
-            <p className="mt-1 font-['Inter'] text-sm text-forge-muted">
-              Your in-browser PostgreSQL 16 WASM sandbox is loaded and ready.
+            <p className="mt-1.5 text-sm text-forge-muted max-w-2xl">
+              Your SQL practice environment is ready. Pick up where you left off or explore new challenges.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             <Link
-              to="/dashboard/editor"
-              className="inline-flex items-center gap-2 border border-forge-accent bg-forge-accent px-5 py-2.5 font-['JetBrains_Mono'] text-xs font-bold uppercase tracking-wider text-[#101114] transition-all hover:bg-forge-accent-hover hover:border-forge-accent-hover"
+              to="/dashboard/drills"
+              className="inline-flex items-center gap-2 rounded-lg border border-forge-accent bg-forge-accent px-4 py-2.5 text-sm font-semibold text-[#101114] transition-all hover:bg-forge-accent-hover hover:border-forge-accent-hover"
             >
-              <span>LAUNCH SQL EDITOR</span>
-              <span>↗</span>
+              <span>Practice MySQL</span>
+              <span aria-hidden="true">→</span>
             </Link>
           </div>
         </div>
@@ -71,60 +69,65 @@ function DashboardHome() {
         {metrics.map((m) => (
           <div
             key={m.label}
-            className="border border-forge-border bg-forge-card p-5 transition-colors hover:border-forge-accent/60"
+            className="rounded-xl border border-forge-border bg-forge-card p-5 transition-colors hover:border-forge-accent/60 shadow-xs"
           >
-            <div className="font-['JetBrains_Mono'] text-[10px] uppercase tracking-wider text-forge-muted">
+            <div className="text-xs font-medium uppercase tracking-wider text-forge-muted">
               {m.label}
             </div>
             <div className="mt-2 font-['Space_Grotesk'] text-2xl font-bold text-forge-text">
               {m.value}
             </div>
-            <div className="mt-1 flex items-center justify-between font-['JetBrains_Mono'] text-[11px]">
-              <span className="text-forge-muted">{m.change}</span>
-              <span className="text-forge-success text-[10px]">● ACTIVE</span>
+            <div className="mt-1 flex items-center justify-between text-xs text-forge-muted">
+              <span>{m.change}</span>
+              <span className="text-forge-success font-medium">● Active</span>
             </div>
           </div>
         ))}
       </div>
 
       {/* Recent Drills & Active Practice Table */}
-      <div className="border border-forge-border bg-forge-card">
-        <div className="flex items-center justify-between border-b border-forge-border bg-forge-card-alt px-5 py-3">
-          <div className="flex items-center gap-2 font-['JetBrains_Mono'] text-xs font-semibold uppercase text-forge-text">
-            <span>RECENT PRACTICE DRILLS</span>
+      <div className="rounded-xl border border-forge-border bg-forge-card overflow-hidden shadow-xs">
+        <div className="flex items-center justify-between border-b border-forge-border bg-forge-card-alt/50 px-5 py-4">
+          <div>
+            <h2 className="font-['Space_Grotesk'] text-base font-bold text-forge-text">
+              Recent Practice Questions
+            </h2>
+            <p className="text-xs text-forge-muted mt-0.5">
+              Challenges you recently viewed or worked on
+            </p>
           </div>
           <Link
             to="/dashboard/drills"
-            className="font-['JetBrains_Mono'] text-xs text-forge-accent hover:underline"
+            className="text-xs font-semibold text-forge-accent hover:underline"
           >
-            VIEW ALL DRILLS ↗
+            View All Questions →
           </Link>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-['JetBrains_Mono'] text-xs">
+          <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-forge-border bg-forge-surface text-[10px] uppercase text-forge-muted">
-                <th className="p-4">ID</th>
-                <th className="p-4">TITLE</th>
-                <th className="p-4">CATEGORY</th>
-                <th className="p-4">DIFFICULTY</th>
-                <th className="p-4">STATUS</th>
-                <th className="p-4 text-right">ACTION</th>
+              <tr className="border-b border-forge-border bg-forge-surface text-[11px] font-semibold uppercase tracking-wider text-forge-muted">
+                <th className="p-4">#</th>
+                <th className="p-4">Title</th>
+                <th className="p-4">Topic</th>
+                <th className="p-4">Difficulty</th>
+                <th className="p-4">Status</th>
+                <th className="p-4 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-forge-border text-forge-text">
               {recentDrills.map((drill) => (
                 <tr key={drill.id} className="hover:bg-forge-card-alt/50 transition-colors">
-                  <td className="p-4 text-forge-muted">#{drill.id}</td>
+                  <td className="p-4 font-mono text-forge-muted">{drill.id}</td>
                   <td className="p-4 font-semibold text-forge-text">{drill.title}</td>
                   <td className="p-4 text-forge-muted">{drill.category}</td>
                   <td className="p-4">
                     <span
-                      className={`text-[10px] px-2 py-0.5 border ${
-                        drill.difficulty === 'HARD'
-                          ? 'border-forge-accent/40 text-forge-accent'
-                          : 'border-forge-success/40 text-forge-success'
+                      className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${
+                        drill.difficulty === 'Hard'
+                          ? 'border-forge-accent/40 text-forge-accent bg-forge-accent/10'
+                          : 'border-yellow-500/40 text-yellow-500 bg-yellow-500/10'
                       }`}
                     >
                       {drill.difficulty}
@@ -132,24 +135,25 @@ function DashboardHome() {
                   </td>
                   <td className="p-4">
                     <span
-                      className={`text-[11px] font-semibold ${
-                        drill.status === 'SOLVED'
+                      className={`text-xs font-medium flex items-center gap-1.5 ${
+                        drill.status === 'Solved'
                           ? 'text-forge-success'
-                          : drill.status === 'IN PROGRESS'
+                          : drill.status === 'In Progress'
                           ? 'text-forge-accent'
                           : 'text-forge-muted'
                       }`}
                     >
-                      ● {drill.status}
+                      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                      {drill.status}
                     </span>
                   </td>
                   <td className="p-4 text-right">
-                    <button
-                      type="button"
-                      className="border border-forge-border bg-forge-surface px-3 py-1 text-xs text-forge-muted hover:border-forge-accent hover:text-forge-accent transition-colors"
+                    <Link
+                      to="/dashboard/drills"
+                      className="inline-block rounded-md border border-forge-border bg-forge-surface px-3 py-1 text-xs font-medium text-forge-muted hover:border-forge-accent hover:text-forge-accent transition-colors"
                     >
-                      OPEN DRILL
-                    </button>
+                      Solve
+                    </Link>
                   </td>
                 </tr>
               ))}
@@ -162,4 +166,3 @@ function DashboardHome() {
 }
 
 export default DashboardHome
-
